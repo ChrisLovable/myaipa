@@ -12,13 +12,8 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-async function generateAndUploadAudio(
-  text: string,
-  language: string,
-  folder: string
-): Promise<string | null> {
+async function generateAndUploadAudio(text: string, folder: string): Promise<string | null> {
   try {
-    const isEnglish = language === 'en'
     const ttsRes = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_TTS_API_KEY}`,
       {
@@ -26,13 +21,8 @@ async function generateAndUploadAudio(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           input: { text },
-          voice: isEnglish
-            ? { languageCode: 'en-GB', name: 'en-GB-Neural2-C', ssmlGender: 'FEMALE' }
-            : { languageCode: 'af-ZA', name: 'af-ZA-Standard-A', ssmlGender: 'FEMALE' },
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: isEnglish ? 1.15 : 1.3,
-          },
+          voice: { languageCode: 'en-GB', name: 'en-GB-Neural2-C', ssmlGender: 'FEMALE' },
+          audioConfig: { audioEncoding: 'MP3', speakingRate: 1.15 },
         }),
       }
     )
@@ -67,36 +57,29 @@ function xmlEscape(s: string): string {
 export async function POST(request: NextRequest) {
   try {
     const form = await request.formData()
-    const callSid     = (form.get('CallSid')     as string) ?? 'unknown'
-    const callStatus  = (form.get('CallStatus')  as string) ?? ''
+    const callSid    = (form.get('CallSid')    as string) ?? 'unknown'
+    const callStatus = (form.get('CallStatus') as string) ?? ''
 
     console.log('[Call/TwiML] CallSid:', callSid, '| CallStatus:', callStatus)
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    const baseUrl    = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    const respondUrl = `${baseUrl}/api/call/respond`
 
-    // Look up call context stored during initiation
+    // Look up user for conversation history
     const { data: callRecord } = await supabaseAdmin
       .from('calls_log')
-      .select('language, user_id')
+      .select('user_id')
       .eq('twilio_sid', callSid)
       .single()
 
-    const language  = callRecord?.language ?? 'af'
-    const userId    = callRecord?.user_id  ?? null
-    const gatherLang = language === 'en' ? 'en-ZA' : 'af-ZA'
+    const userId = callRecord?.user_id ?? null
 
-    const greetingText = language === 'en'
-      ? "Hello! I'm Gabby, your personal AI assistant. How can I help you today?"
-      : "Hallo! Ek is Gabby, jou persoonlike AI-assistent. Hoe kan ek jou help vandag?"
+    const greetingText =
+      "Hello! I'm Gabby, Chris's personal AI assistant. How can I help you today?"
 
-    const fallbackText = language === 'en'
-      ? "I didn't hear you. Goodbye!"
-      : "Ek het jou nie gehoor nie. Totsiens!"
+    const greetingUrl = await generateAndUploadAudio(greetingText, `greeting/${callSid}`)
 
-    // Generate greeting audio via Google TTS — Gabby's voice from the very first word
-    const greetingUrl = await generateAndUploadAudio(greetingText, language, `greeting/${callSid}`)
-
-    // Store greeting as the first assistant turn so respond route has history
+    // Store greeting as first assistant turn so respond route has history
     await supabaseAdmin.from('call_conversations').insert({
       call_sid: callSid,
       user_id:  userId,
@@ -106,25 +89,24 @@ export async function POST(request: NextRequest) {
       if (error) console.error('[Call/TwiML] DB insert error:', error.message)
     })
 
-    const respondUrl = `${baseUrl}/api/call/respond`
+    const gatherAttrs = `input="speech" action="${respondUrl}" method="POST" language="en-US" speechTimeout="3" timeout="15" enhanced="true"`
 
     let xml: string
     if (greetingUrl) {
       xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Play>${greetingUrl}</Play>
-  <Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10">
+  <Gather ${gatherAttrs}>
   </Gather>
-  <Say>${xmlEscape(fallbackText)}</Say>
+  <Redirect>${respondUrl}</Redirect>
 </Response>`
     } else {
-      // Fallback — plain <Say> if TTS or upload failed
       xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say>${xmlEscape(greetingText)}</Say>
-  <Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10">
+  <Gather ${gatherAttrs}>
   </Gather>
-  <Say>${xmlEscape(fallbackText)}</Say>
+  <Redirect>${respondUrl}</Redirect>
 </Response>`
     }
 
@@ -134,7 +116,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[Call/TwiML] unhandled error:', err)
     return new NextResponse(
-      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Hallo, ek is Gabby. Hoe kan ek help?</Say></Response>`,
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Hello, I'm Gabby. How can I help?</Say></Response>`,
       { headers: { 'Content-Type': 'text/xml; charset=utf-8' } }
     )
   }

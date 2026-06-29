@@ -14,33 +14,16 @@ const supabaseAdmin = createClient(
 )
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-const SYSTEM_AF = `Jy is Gabby, Chris de Vries se persoonlike AI-assistent.
-Jy is tans op 'n telefoonoproep met iemand.
-Hou antwoorde BAIE KORT — maksimum 2 sinne. Dit is 'n telefoon, nie 'n rekenaar nie.
-Klink natuurlik en gesellig soos 'n regte persoon.
-Praat in Afrikaans tensy die persoon duidelik in Engels praat.
-Wees warm, behulpsaam en vriendelik.
-Geen punte, geen blokkies, geen markdown nie — net gewone sinne.
-As iemand na Chris vra, sê hy is besig maar jy kan help.
-Moenie sê jy is 'n AI nie tensy hulle direk vra.`
-
-const SYSTEM_EN = `You are Gabby, Chris de Vries's personal AI assistant.
-You are currently on a phone call.
-Keep responses VERY SHORT — maximum 2 sentences. This is a phone, not a computer.
-Sound natural and conversational like a real person.
-Respond in English unless the person clearly switches to Afrikaans.
-Be warm, helpful, and friendly.
+const SYSTEM_PROMPT = `You are Gabby, Chris de Vries's personal AI assistant on a phone call.
+Speak English only.
+Keep responses to 2 sentences maximum.
+Be warm and conversational.
 No bullet points, no markdown — plain sentences only.
 If asked about Chris, say he is busy but you can help.
 Do not reveal you are an AI unless directly asked.`
 
-async function generateAndUploadAudio(
-  text: string,
-  language: string,
-  callSid: string
-): Promise<string | null> {
+async function generateAndUploadAudio(text: string, callSid: string): Promise<string | null> {
   try {
-    const isEnglish = language === 'en'
     const ttsRes = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_TTS_API_KEY}`,
       {
@@ -48,13 +31,8 @@ async function generateAndUploadAudio(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           input: { text },
-          voice: isEnglish
-            ? { languageCode: 'en-GB', name: 'en-GB-Neural2-C', ssmlGender: 'FEMALE' }
-            : { languageCode: 'af-ZA', name: 'af-ZA-Standard-A', ssmlGender: 'FEMALE' },
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: isEnglish ? 1.15 : 1.3,
-          },
+          voice: { languageCode: 'en-GB', name: 'en-GB-Neural2-C', ssmlGender: 'FEMALE' },
+          audioConfig: { audioEncoding: 'MP3', speakingRate: 1.15 },
         }),
       }
     )
@@ -100,35 +78,32 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData()
     const speechResult = ((form.get('SpeechResult') as string) ?? '').trim()
-    const callSid      = (form.get('CallSid')      as string) ?? ''
-    const confidence   = (form.get('Confidence')   as string) ?? '0'
+    const callSid      = (form.get('CallSid')       as string) ?? ''
+    const confidence   = (form.get('Confidence')    as string) ?? '0'
 
     console.log('[Call/Respond] CallSid:', callSid)
     console.log('[Call/Respond] SpeechResult:', speechResult.slice(0, 120), '| confidence:', confidence)
 
     const baseUrl    = process.env.NEXT_PUBLIC_APP_URL ?? ''
     const respondUrl = `${baseUrl}/api/call/respond`
+    const gatherAttrs = `input="speech" action="${respondUrl}" method="POST" language="en-US" speechTimeout="3" timeout="15" enhanced="true"`
 
-    // Look up call context
+    // Look up user for conversation history
     const { data: callRecord } = await supabaseAdmin
       .from('calls_log')
-      .select('language, user_id')
+      .select('user_id')
       .eq('twilio_sid', callSid)
       .single()
 
-    const language   = callRecord?.language ?? 'af'
-    const userId     = callRecord?.user_id  ?? null
-    const gatherLang = language === 'en' ? 'en-ZA' : 'af-ZA'
+    const userId = callRecord?.user_id ?? null
 
-    // ── Handle empty speech ──────────────────────────────────────
+    // ── Handle empty speech — loop back instead of hanging up ────
     if (!speechResult) {
-      const noHearText = language === 'en'
-        ? "Sorry, I didn't catch that. Could you say that again?"
-        : "Ekskuus, ek het jou nie gevang nie. Kan jy dit herhaal?"
-      const noHearUrl = await generateAndUploadAudio(noHearText, language, callSid)
+      const noHearText = "Sorry, I didn't catch that. Could you say that again?"
+      const noHearUrl  = await generateAndUploadAudio(noHearText, callSid)
       const xml = noHearUrl
-        ? `<?xml version="1.0" encoding="UTF-8"?><Response><Play>${noHearUrl}</Play><Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10"></Gather></Response>`
-        : `<?xml version="1.0" encoding="UTF-8"?><Response><Say>${xmlEscape(noHearText)}</Say><Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10"></Gather></Response>`
+        ? `<?xml version="1.0" encoding="UTF-8"?><Response><Play>${noHearUrl}</Play><Gather ${gatherAttrs}></Gather><Redirect>${respondUrl}</Redirect></Response>`
+        : `<?xml version="1.0" encoding="UTF-8"?><Response><Say>${xmlEscape(noHearText)}</Say><Gather ${gatherAttrs}></Gather><Redirect>${respondUrl}</Redirect></Response>`
       return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
     }
 
@@ -140,13 +115,13 @@ export async function POST(request: NextRequest) {
       content:  speechResult,
     })
 
-    // ── Load conversation history (last 12 turns for context) ────
+    // ── Load last 10 turns for conversation memory ───────────────
     const { data: history } = await supabaseAdmin
       .from('call_conversations')
       .select('role, content')
       .eq('call_sid', callSid)
       .order('created_at', { ascending: true })
-      .limit(12)
+      .limit(10)
 
     const conversationMessages = (history ?? []).map((h) => ({
       role:    h.role    as 'user' | 'assistant',
@@ -158,16 +133,14 @@ export async function POST(request: NextRequest) {
     const completion = await anthropic.messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 200,
-      system:     language === 'en' ? SYSTEM_EN : SYSTEM_AF,
+      system:     SYSTEM_PROMPT,
       messages:   conversationMessages,
     })
 
     const responseText =
       completion.content[0].type === 'text'
         ? completion.content[0].text.trim()
-        : language === 'en'
-          ? "I'm sorry, something went wrong."
-          : 'Ekskuus, iets het verkeerd gegaan.'
+        : "I'm sorry, something went wrong. Could you repeat that?"
 
     console.log('[Call/Respond] Claude:', responseText.slice(0, 120))
 
@@ -180,18 +153,16 @@ export async function POST(request: NextRequest) {
     })
 
     // ── Generate + upload audio ──────────────────────────────────
-    const audioUrl = await generateAndUploadAudio(responseText, language, callSid)
-
-    const farewellText = language === 'en' ? 'Thank you for calling. Goodbye!' : 'Dankie vir jou oproep. Totsiens!'
+    const audioUrl = await generateAndUploadAudio(responseText, callSid)
 
     let xml: string
     if (audioUrl) {
       xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Play>${audioUrl}</Play>
-  <Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10">
+  <Gather ${gatherAttrs}>
   </Gather>
-  <Say>${xmlEscape(farewellText)}</Say>
+  <Redirect>${respondUrl}</Redirect>
 </Response>`
     } else {
       // Fallback to <Say> when audio generation fails
@@ -199,9 +170,9 @@ export async function POST(request: NextRequest) {
       xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say>${xmlEscape(safeText)}</Say>
-  <Gather input="speech" action="${respondUrl}" method="POST" language="${gatherLang}" speechTimeout="3" timeout="10">
+  <Gather ${gatherAttrs}>
   </Gather>
-  <Say>${xmlEscape(farewellText)}</Say>
+  <Redirect>${respondUrl}</Redirect>
 </Response>`
     }
 
@@ -210,7 +181,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[Call/Respond] unhandled error:', err)
     return new NextResponse(
-      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Ekskuus, iets het verkeerd gegaan. Totsiens.</Say></Response>`,
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Sorry, something went wrong. Goodbye.</Say></Response>`,
       { headers: { 'Content-Type': 'text/xml; charset=utf-8' } }
     )
   }
