@@ -1,0 +1,39 @@
+
+> myaipa@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+> [PWA] PWA support is disabled
+> [PWA] PWA support is disabled
+ ✓ Ready in 5.4s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 540ms (127 modules)
+ ○ Compiling /chat ...
+ ✓ Compiled /_not-found in 12.8s (620 modules)
+ GET /_next/static/css/app/layout.css?v=1782664314158 404 in 5637ms
+ GET /_next/static/chunks/webpack.js?v=1782664314158 404 in 5975ms
+ GET /_next/static/chunks/main-app.js?v=1782664314158 404 in 6066ms
+ GET /chat 200 in 14576ms
+ GET /chat 200 in 91ms
+ GET /_next/static/3HNIGkxZ4kTPI4-9DZFIn/_buildManifest.js 404 in 34ms
+ ✓ Compiled /api/transcribe in 438ms (342 modules)
+[Transcribe] called — raw lang: af → ElevenLabs lang: afr
+[Transcribe] audio: 51494 bytes | type: audio/webm;codecs=opus
+[Transcribe] API key present, length: 51
+[Transcribe] calling ElevenLabs speech-to-text...
+[Transcribe] ElevenLabs HTTP status: 400
+ POST /api/transcribe 500 in 1459ms
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 3.1s (499 modules)
+ POST /api/chat 200 in 9703ms
+ ✓ Compiled /api/tts in 161ms (501 modules)
+ POST /api/tts 500 in 844ms
+ ✓ Compiled in 723ms (617 modules)
+ GET /chat 200 in 186ms
+ ✓ Compiled /_not-found in 331ms (620 modules)
+ GET /_next/static/3HNIGkxZ4kTPI4-9DZFIn/_buildManifest.js 404 in 454ms
+ ✓ Compiled in 2.1s (620 modules)

@@ -1,0 +1,936 @@
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (102kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (250kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (102kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (250kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ElevenLabs error: {"detail":{"type":"validation_error","code":"invalid_parameters","message":"Must provide either file or a URL parameter.","status":"invalid_parameters","request_id":"ba267c0cff8f5b0a9c7ea8d23f39bb2b","param":"file"}}
+ElevenLabs error: {"detail":{"type":"validation_error","code":"invalid_parameters","message":"Must provide either file or a URL parameter.","status":"invalid_parameters","request_id":"94f992acb74ab2939e13f7203a156bfe","param":"file"}}
+ElevenLabs error: {"detail":{"type":"validation_error","code":"invalid_parameters","message":"Must provide either file or a URL parameter.","status":"invalid_parameters","request_id":"62a9d8a5394626cbd49f7849e5238596","param":"file"}}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\app\chat\page.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\api\transcribe\route.js:1:1951
+    at Object.<anonymous> (C:\myaipa\.next\server\app\api\transcribe\route.js:1:1997)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\app\\chat\\page.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/api/transcribe'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\pages\_document.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:203:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:116:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:167:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\pages\\_document.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\app\chat\page.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:198:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:162:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\app\\chat\\page.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\app\chat\page.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:198:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:162:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\app\\chat\\page.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\app\chat\page.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:198:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:162:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\app\\chat\\page.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- C:\myaipa\.next\server\webpack-runtime.js
+- C:\myaipa\.next\server\app\chat\page.js
+- C:\myaipa\node_modules\next\dist\server\require.js
+- C:\myaipa\node_modules\next\dist\server\load-components.js
+- C:\myaipa\node_modules\next\dist\build\utils.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\myaipa\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\myaipa\node_modules\next\dist\server\lib\router-server.js
+- C:\myaipa\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\myaipa\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\myaipa\.next\server\webpack-runtime.js:198:28)
+    at C:\myaipa\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\myaipa\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\myaipa\.next\server\webpack-runtime.js:162:22)
+    at C:\myaipa\.next\server\app\chat\page.js:1:18832
+    at Object.<anonymous> (C:\myaipa\.next\server\app\chat\page.js:1:18886)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\myaipa\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\myaipa\node_modules\next\dist\server\require.js:109:84)
+    at C:\myaipa\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\myaipa\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\myaipa\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\myaipa\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\myaipa\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\myaipa\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\myaipa\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\myaipa\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\myaipa\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\myaipa\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\myaipa\\.next\\server\\webpack-runtime.js',
+    'C:\\myaipa\\.next\\server\\app\\chat\\page.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\myaipa\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/chat'
+}
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.

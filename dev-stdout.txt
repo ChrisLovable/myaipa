@@ -1,0 +1,107 @@
+
+> myaipa@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+> [PWA] PWA support is disabled
+> [PWA] PWA support is disabled
+ ✓ Ready in 13s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 2.3s (127 modules)
+ ○ Compiling / ...
+ ✓ Compiled /register in 17.4s (655 modules)
+ GET /register 200 in 8434ms
+ ✓ Compiled /login in 252ms (647 modules)
+ GET /login 200 in 563ms
+ ✓ Compiled /chat in 425ms (663 modules)
+ GET /chat 200 in 552ms
+ GET / 200 in 301ms
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 2.3s (683 modules)
+ GET /onboarding 200 in 3493ms
+ ○ Compiling /settings ...
+ ✓ Compiled /settings in 1325ms (675 modules)
+ GET /settings 200 in 2278ms
+ GET /login? 200 in 131ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /register in 2.4s (666 modules)
+ ✓ Compiled (670 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 3096ms
+ GET /_next/static/Jhjv1Wfr4Q-WOjGIVAHJV/_buildManifest.js 404 in 623ms
+   Reload env: .env.local
+ ✓ Compiled in 2.3s (790 modules)
+ GET /register 200 in 268ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 895ms (652 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1043ms
+ GET /_next/static/Jhjv1Wfr4Q-WOjGIVAHJV/_buildManifest.js 404 in 133ms
+ ✓ Compiled / in 361ms (335 modules)
+ GET /?code=8255c664-8219-4a58-9921-4ea9da4d2f0a 200 in 589ms
+ GET /_next/static/Jhjv1Wfr4Q-WOjGIVAHJV/_buildManifest.js 404 in 48ms
+ ✓ Compiled /login in 237ms (339 modules)
+ ✓ Compiled /onboarding in 140ms (344 modules)
+ HEAD /gabby_intro.mp4 404 in 87ms
+ HEAD /gabby_intro.mp4 404 in 39ms
+ ✓ Compiled /chat in 197ms (352 modules)
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 1830ms (535 modules)
+ ○ Compiling /api/call ...
+ ✓ Compiled /api/call in 6.7s (1486 modules)
+ POST /api/call 200 in 9046ms
+ POST /api/chat 200 in 14574ms
+ ✓ Compiled /api/tts in 293ms (1487 modules)
+ POST /api/tts 200 in 3012ms
+ ✓ Compiled /favicon.ico in 366ms (1516 modules)
+ GET /favicon.ico 200 in 450ms
+ ✓ Compiled /settings in 322ms (1520 modules)
+ POST /api/chat 200 in 9424ms
+ POST /api/tts 200 in 5760ms
+ GET /favicon.ico 200 in 18ms
+ ✓ Compiled /api/transcribe in 196ms (571 modules)
+ POST /api/transcribe 500 in 1499ms
+ POST /api/chat 200 in 6652ms
+ POST /api/tts 200 in 2802ms
+ POST /api/transcribe 500 in 973ms
+ POST /api/chat 200 in 7235ms
+ POST /api/tts 200 in 2984ms
+ POST /api/transcribe 500 in 689ms
+ ✓ Compiled in 2.3s (872 modules)
+ ✓ Compiled in 779ms (713 modules)
+ ✓ Compiled in 233ms (334 modules)
+ ✓ Compiled in 509ms (713 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 4s (939 modules)
+ POST /api/transcribe 500 in 4879ms
+ GET /chat 500 in 43ms
+ GET /chat 500 in 27ms
+ ✓ Compiled in 1056ms (911 modules)
+ GET /chat 500 in 95ms
+ GET /chat 500 in 46ms
+ GET /chat 500 in 37ms
+ GET /chat 500 in 40ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1702ms (423 modules)
+ GET /favicon.ico 200 in 1849ms
+ GET /favicon.ico 200 in 13ms
+ ✓ Compiled in 2.2s (943 modules)
+ GET /chat 200 in 1317ms
+ GET /chat 200 in 77ms
+ GET /chat 200 in 83ms
+ GET /chat 200 in 66ms
+ GET /chat 200 in 94ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 660ms (932 modules)
+ GET /chat 200 in 884ms
+ GET /_next/static/css/app/layout.css?v=1782664087153 404 in 1206ms
+ GET /_next/static/chunks/main-app.js?v=1782664087153 404 in 1188ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1176ms
+ GET /_next/static/css/app/layout.css?v=1782664088185 404 in 95ms
+ GET /_next/static/chunks/main-app.js?v=1782664088185 404 in 74ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 57ms
+ GET /favicon.ico 200 in 41ms
+ GET /favicon.ico 200 in 13ms
+ ✓ Compiled in 295ms (522 modules)

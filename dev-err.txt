@@ -1,0 +1,2 @@
+[Transcribe] ElevenLabs error body: {"detail":{"type":"validation_error","code":"invalid_parameters","message":"Must provide either file or a URL parameter.","status":"invalid_parameters","request_id":"7fd95786e9b5fb7d986cc0df6fd533cd","param":"file"}}
+ElevenLabs TTS error: {"detail":{"type":"validation_error","code":"invalid_parameters","message":"Model 'eleven_turbo_v2_5' does not support language_code 'af'.","status":"unsupported_language","request_id":"36a4effa092f76e8f70daeec204c31c5","param":"language_code"}}
