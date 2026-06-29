@@ -1,77 +1,93 @@
 import { NextRequest, NextResponse } from 'next/server'
-import twilio from 'twilio'
-import { createClient } from '@supabase/supabase-js'
-
-export const runtime = 'nodejs'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const { to, message, userId, language } = await request.json()
-    console.log('[Call] to:', to, '| language:', language, '| userId:', userId)
+    const { to, message, userId } = await request.json()
 
-    if (!to) {
-      return NextResponse.json({ error: 'Nommer vereis' }, { status: 400 })
+    console.log('Vapi call request, to:', to)
+
+    const apiKey       = process.env.VAPI_API_KEY?.trim()
+    const phoneNumberId = process.env.VAPI_PHONE_NUMBER_ID?.trim()
+    const assistantId  = process.env.VAPI_ASSISTANT_ID?.trim()
+
+    if (!apiKey || !phoneNumberId || !assistantId) {
+      console.error('Missing Vapi credentials')
+      return NextResponse.json({ error: 'Vapi not configured' }, { status: 500 })
     }
 
-    const accountSid = process.env.TWILIO_ACCOUNT_SID
-    const authToken  = process.env.TWILIO_AUTH_TOKEN
-    const fromNumber = process.env.TWILIO_PHONE_NUMBER
-    const baseUrl    = process.env.NEXT_PUBLIC_APP_URL
-
-    if (!accountSid || !authToken || !fromNumber) {
-      console.error('[Call] missing Twilio env vars')
-      return NextResponse.json({ error: 'Twilio nie opgestel nie' }, { status: 500 })
+    // Format SA number to E.164
+    let toNumber = to.trim().replace(/\s/g, '')
+    if (toNumber.startsWith('0')) {
+      toNumber = '+27' + toNumber.substring(1)
+    }
+    if (!toNumber.startsWith('+')) {
+      toNumber = '+' + toNumber
     }
 
-    if (!baseUrl || baseUrl.includes('localhost')) {
-      console.warn('[Call] NEXT_PUBLIC_APP_URL is localhost — ngrok required for Twilio webhooks')
-    }
+    console.log('Calling via Vapi to:', toNumber)
 
-    const client = twilio(accountSid, authToken)
-
-    // Two-way conversation via webhooks — /api/call/twiml handles the greeting
-    // and /api/call/respond handles each speech turn using Claude + Google TTS.
-    const call = await client.calls.create({
-      to,
-      from:                 fromNumber,
-      url:                  `${baseUrl}/api/call/twiml`,
-      statusCallback:       `${baseUrl}/api/call/status`,
-      statusCallbackMethod: 'POST',
+    const response = await fetch('https://api.vapi.ai/call/phone', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phoneNumberId,
+        assistantId,
+        customer: {
+          number: toNumber,
+        },
+        assistantOverrides: {
+          firstMessage: message || "Hello! I'm Gabby, Chris de Vries's personal AI assistant. How can I help you today?",
+        },
+      }),
     })
 
-    console.log('[Call] created — sid:', call.sid, '| status:', call.status)
+    const data = await response.json()
+    console.log('Vapi response:', data)
 
-    if (userId) {
-      const { error: dbErr } = await supabaseAdmin.from('calls_log').insert({
-        user_id:     userId,
-        call_type:   'outbound',
-        to_number:   to,
-        from_number: fromNumber,
-        message:     message || '',
-        twilio_sid:  call.sid,
-        status:      call.status,
-        language:    language || 'af',
+    if (!response.ok) {
+      console.error('Vapi error:', data)
+      return NextResponse.json(
+        { error: data.message || 'Call failed' },
+        { status: 500 }
+      )
+    }
+
+    // Save to Supabase calls_log
+    try {
+      const cookieStore = cookies()
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { cookies: { get: (name) => cookieStore.get(name)?.value } }
+      )
+
+      await supabase.from('calls_log').insert({
+        user_id:    userId,
+        type:       'call',
+        to_number:  toNumber,
+        message:    message,
+        twilio_sid: data.id,
+        status:     data.status,
       })
-      if (dbErr) console.error('[Call] DB log error:', dbErr.message)
+    } catch (dbErr) {
+      console.error('DB save error:', dbErr)
     }
 
     return NextResponse.json({
       success: true,
-      sid:     call.sid,
-      status:  call.status,
-      to,
+      callId:  data.id,
+      status:  data.status,
+      message: `Ek bel nou ${toNumber}. Gabby sal die gesprek hanteer.`,
     })
-  } catch (err) {
-    const e = err as Error & { code?: number; moreInfo?: string }
-    console.error('[Call] Twilio error — code:', e.code, '| message:', e.message, '| moreInfo:', e.moreInfo)
-    return NextResponse.json(
-      { error: e.message, code: e.code, moreInfo: e.moreInfo },
-      { status: 500 }
-    )
+
+  } catch (err: unknown) {
+    const e = err as Error
+    console.error('Call error:', e)
+    return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }
