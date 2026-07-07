@@ -1,5 +1,5 @@
-// Twilio WhatsApp webhook — called when a WhatsApp message/voice note arrives.
-// No auth required — Twilio POSTs here directly (sandbox or production sender).
+﻿// Twilio WhatsApp webhook â€” called when a WhatsApp message/voice note arrives.
+// No auth required â€” Twilio POSTs here directly (sandbox or production sender).
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -28,7 +28,7 @@ function xmlEscape(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-// ── Download Twilio media (requires Basic Auth) ──────────────────────
+// â”€â”€ Download Twilio media (requires Basic Auth) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function downloadTwilioMedia(mediaUrl: string): Promise<Buffer> {
   const res = await fetch(mediaUrl, {
     headers: {
@@ -44,12 +44,12 @@ async function downloadTwilioMedia(mediaUrl: string): Promise<Buffer> {
   return Buffer.from(await res.arrayBuffer())
 }
 
-// ── Transcribe via ElevenLabs Scribe ─────────────────────────────────
+// â”€â”€ Transcribe via ElevenLabs Scribe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   const form = new FormData()
-  form.append('file', new Blob([audioBuffer], { type: 'audio/ogg' }), 'voice.ogg')
+  form.append('file', new Blob([new Uint8Array(audioBuffer)], { type: 'audio/ogg' }), 'voice.ogg')
   form.append('model_id', 'scribe_v1')
-  // No language forced — Scribe auto-detects (handles both English and Afrikaans)
+  // No language forced â€” Scribe auto-detects (handles both English and Afrikaans)
 
   const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
     method: 'POST',
@@ -66,7 +66,7 @@ async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   return data.text ?? ''
 }
 
-// ── Ask Gabby (Claude) ────────────────────────────────────────────────
+// â”€â”€ Ask Gabby (Claude) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function askGabby(userMessage: string): Promise<string> {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -92,7 +92,7 @@ async function askGabby(userMessage: string): Promise<string> {
   return result.content?.[0]?.text ?? "Sorry, I didn't catch that."
 }
 
-// ── TTS via ElevenLabs (Flash first, multilingual fallback) — matches /api/tts ──
+// â”€â”€ TTS via ElevenLabs (Flash first, multilingual fallback) â€” matches /api/tts â”€â”€
 async function synthesizeElevenLabs(text: string, modelId: string): Promise<ArrayBuffer | null> {
   const apiKey = process.env.ELEVENLABS_API_KEY!
   const voiceId = process.env.ELEVENLABS_VOICE_ID!
@@ -122,7 +122,7 @@ async function synthesizeElevenLabs(text: string, modelId: string): Promise<Arra
 async function textToSpeechAndUpload(text: string, folder: string): Promise<string | null> {
   let audioBuffer = await synthesizeElevenLabs(text, 'eleven_flash_v2_5')
   if (!audioBuffer) {
-    console.log('[WhatsApp TTS] Flash failed — falling back to eleven_multilingual_v2')
+    console.log('[WhatsApp TTS] Flash failed â€” falling back to eleven_multilingual_v2')
     audioBuffer = await synthesizeElevenLabs(text, 'eleven_multilingual_v2')
   }
   if (!audioBuffer || audioBuffer.byteLength < 100) return null
@@ -143,7 +143,7 @@ async function textToSpeechAndUpload(text: string, folder: string): Promise<stri
   return urlData.publicUrl
 }
 
-// ── Main webhook ──────────────────────────────────────────────────────
+// â”€â”€ Main webhook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function POST(request: NextRequest) {
   try {
     const form = await request.formData()
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
     if (numMedia > 0 && mediaType.startsWith('audio/')) {
       console.log('[WhatsApp] downloading voice note...')
       const audioBuffer = await downloadTwilioMedia(mediaUrl)
-      console.log(`[WhatsApp] downloaded ${audioBuffer.length} bytes — transcribing...`)
+      console.log(`[WhatsApp] downloaded ${audioBuffer.length} bytes â€” transcribing...`)
       userMessage = await transcribeAudio(audioBuffer)
       console.log(`[WhatsApp] transcribed: "${userMessage}"`)
     } else if (body) {
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
 
     if (!userMessage) {
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>I didn't catch that — could you try again?</Message></Response>`
+<Response><Message>I didn't catch that â€” could you try again?</Message></Response>`
       return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
     }
 
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 <Response><Message>${xmlEscape(gabbyReply)}</Message></Response>`
     }
 
-    console.log('[WhatsApp] reply sent —', audioUrl ? 'text + voice note' : 'text only (TTS failed)')
+    console.log('[WhatsApp] reply sent â€”', audioUrl ? 'text + voice note' : 'text only (TTS failed)')
     return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
   } catch (err) {
     console.error('[WhatsApp] unhandled error:', err)
