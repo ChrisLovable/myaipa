@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
     const callSid    = (form.get('CallSid')    as string) ?? 'unknown'
     const callStatus = (form.get('CallStatus') as string) ?? ''
 
-    console.log('[Call/TwiML] CallSid:', callSid, '| CallStatus:', callStatus)
+    // The reminder reason, passed via query string from /api/call/outbound
+    const reason = request.nextUrl.searchParams.get('reason') ?? ''
+
+    console.log('[Call/TwiML] CallSid:', callSid, '| CallStatus:', callStatus, '| reason:', reason)
 
     const baseUrl    = process.env.NEXT_PUBLIC_APP_URL ?? ''
     const respondUrl = `${baseUrl}/api/call/respond`
@@ -74,8 +77,10 @@ export async function POST(request: NextRequest) {
 
     const userId = callRecord?.user_id ?? null
 
-    const greetingText =
-      "Hello! I'm Gabby, Chris's personal AI assistant. How can I help you today?"
+    // Personalized greeting: always introduce as Gabby, include the reminder reason if present
+    const greetingText = reason
+      ? `Hi, this is Gabby calling to remind you: ${reason}.`
+      : "Hello! I'm Gabby, your personal AI assistant. How can I help you today?"
 
     const greetingUrl = await generateAndUploadAudio(greetingText, `greeting/${callSid}`)
 
@@ -110,13 +115,13 @@ export async function POST(request: NextRequest) {
 </Response>`
     }
 
-    console.log('[Call/TwiML] returning TwiML — audio:', greetingUrl ? 'Play (Google TTS)' : 'Say (fallback)')
+    console.log('[Call/TwiML] returning TwiML â€” audio:', greetingUrl ? 'Play (Google TTS)' : 'Say (fallback)')
     return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
 
   } catch (err) {
     console.error('[Call/TwiML] unhandled error:', err)
     return new NextResponse(
-      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Hello, I'm Gabby. How can I help?</Say></Response>`,
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Hi, this is Gabby. Sorry, I had a small hiccup — how can I help?</Say></Response>`,
       { headers: { 'Content-Type': 'text/xml; charset=utf-8' } }
     )
   }
