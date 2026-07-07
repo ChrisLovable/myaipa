@@ -1,7 +1,9 @@
-// Outbound call route — now powered by Vapi instead of raw Twilio + Google TTS.
-// This means reminder calls are fully conversational: same voice, same brain,
-// same barge-in as inbound calls, and the person can respond, ask questions,
-// or reschedule mid-call using the same schedule_call tool.
+// Outbound call route — powered by Vapi for natural conversational callbacks.
+// IMPORTANT: Vapi only supports overriding firstMessage and dynamic {{variables}}
+// per call for dashboard-created assistants — NOT the system prompt text itself.
+// So the reminder reason is passed as a variable ({{reminder_reason}}) that the
+// dashboard system prompt references, with an explicit instruction there never
+// to read it aloud verbatim.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -31,12 +33,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Vapi nie opgestel nie' }, { status: 500 })
     }
 
-    // Build a natural opening line that includes the reminder reason,
-    // but explicitly invites conversation rather than just announcing.
     const reminderReason = message || ''
-    const firstMessage = reminderReason
-      ? `Hi, this is Gabby calling to remind you: ${reminderReason}. Does that still work for you, or would you like to change anything?`
-      : "Hi, this is Gabby calling to check in. How can I help?"
+
+    // Generic, natural opener — never includes the raw reason text.
+    const firstMessage = "Hi! This is Gabby, calling on Chris's behalf."
 
     const vapiRes = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           firstMessage,
           variableValues: {
             reminder_reason: reminderReason,
-            is_reminder_call: true,
+            is_reminder_call: reminderReason ? true : false,
           },
         },
       }),
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         to_number:   to,
         from_number: vapiPhoneNumberId,
         message:     message || '',
-        twilio_sid:  vapiData.id, // reusing this column for the Vapi call id
+        twilio_sid:  vapiData.id,
         status:      vapiData.status || 'queued',
         language:    language || 'en',
       })
