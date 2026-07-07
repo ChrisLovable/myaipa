@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phoneNumber: call.phone_number,
-          reason: call.reason,
+          to: call.phone_number,
+          message: call.reason,
         }),
       })
 
