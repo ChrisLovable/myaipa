@@ -1,7 +1,6 @@
-// Runs periodically (triggered by cron-job.org). Two jobs each run:
-// 1. Check on recently-fired calls ("dialing" status) — if busy/no-answer,
-//    reschedule a retry (up to max_retries); if connected, mark completed.
-// 2. Fire any newly-due pending calls.
+﻿// Runs periodically (cron-job.org). Handles TWO systems:
+// 1. scheduled_calls â€” simple reminder calls with retry logic
+// 2. delegated_calls - generic outbound task and report-back chains
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -13,7 +12,7 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const RETRYABLE_REASONS = ['customer-busy', 'no-answer', 'voicemail']
+const RETRYABLE_REASONS = ['customer-busy', 'customer-did-not-answer', 'voicemail', 'worker-shutdown', 'silence-timed-out']
 const RETRY_DELAY_MINUTES = 5
 
 async function checkVapiCallStatus(callId: string) {
@@ -25,15 +24,28 @@ async function checkVapiCallStatus(callId: string) {
   return res.json()
 }
 
+async function fireOutboundCall(to: string, message: string, summaryPrompt?: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const res = await fetch(`${baseUrl}/api/call/outbound`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to, message, summaryPrompt }),
+  })
+  if (!res.ok) return null
+  return res.json()
+}
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const results: any[] = []
+  const results: Array<Record<string, unknown>> = []
 
-  // ─── PHASE 1: Check on calls that are currently "dialing" ───
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // SCHEDULED_CALLS: check dialing â†’ fire due pending
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   const { data: dialingCalls } = await supabaseAdmin
     .from('scheduled_calls')
     .select('*')
@@ -41,96 +53,314 @@ export async function GET(request: NextRequest) {
 
   for (const call of dialingCalls ?? []) {
     if (!call.vapi_call_id) continue
-
     const vapiCall = await checkVapiCallStatus(call.vapi_call_id)
-    if (!vapiCall || vapiCall.status !== 'ended') {
-      // Still in progress, check again next run
-      continue
-    }
+    if (!vapiCall || vapiCall.status !== 'ended') continue
 
     const endedReason = vapiCall.endedReason || ''
     const isRetryable = RETRYABLE_REASONS.some((r) => endedReason.includes(r))
 
     if (isRetryable && call.retry_count < call.max_retries) {
       const nextAttempt = new Date(Date.now() + RETRY_DELAY_MINUTES * 60 * 1000)
-      await supabaseAdmin
-        .from('scheduled_calls')
-        .update({
-          status: 'pending',
-          scheduled_time: nextAttempt.toISOString(),
-          retry_count: call.retry_count + 1,
-        })
-        .eq('id', call.id)
-      console.log(`[Cron] ${call.id} was ${endedReason} — retry ${call.retry_count + 1}/${call.max_retries} scheduled for ${nextAttempt.toISOString()}`)
-      results.push({ id: call.id, action: 'retry_scheduled', endedReason, retryCount: call.retry_count + 1 })
+      await supabaseAdmin.from('scheduled_calls').update({
+        status: 'pending', scheduled_time: nextAttempt.toISOString(), retry_count: call.retry_count + 1,
+      }).eq('id', call.id)
+      results.push({ id: call.id, type: 'scheduled_call', action: 'retry_scheduled', endedReason })
     } else if (isRetryable) {
-      // Exhausted retries
-      await supabaseAdmin
-        .from('scheduled_calls')
-        .update({ status: 'failed', called_at: new Date().toISOString() })
-        .eq('id', call.id)
-      console.log(`[Cron] ${call.id} exhausted retries after ${endedReason}`)
-      results.push({ id: call.id, action: 'retries_exhausted', endedReason })
+      await supabaseAdmin.from('scheduled_calls').update({ status: 'failed', called_at: new Date().toISOString() }).eq('id', call.id)
+      results.push({ id: call.id, type: 'scheduled_call', action: 'retries_exhausted', endedReason })
     } else {
-      // Connected successfully (or ended for a non-retryable reason)
-      await supabaseAdmin
-        .from('scheduled_calls')
-        .update({ status: 'called', called_at: new Date().toISOString() })
-        .eq('id', call.id)
-      results.push({ id: call.id, action: 'completed', endedReason })
+      await supabaseAdmin.from('scheduled_calls').update({ status: 'called', called_at: new Date().toISOString() }).eq('id', call.id)
+      results.push({ id: call.id, type: 'scheduled_call', action: 'completed', endedReason })
     }
   }
 
-  // ─── PHASE 2: Fire newly-due pending calls ───
   const now = new Date().toISOString()
-  const { data: dueCalls, error } = await supabaseAdmin
-    .from('scheduled_calls')
+  const { data: dueCalls } = await supabaseAdmin
+    .from('scheduled_calls').select('*').eq('status', 'pending').lte('scheduled_time', now)
+
+  for (const call of dueCalls ?? []) {
+    const data = await fireOutboundCall(call.phone_number, call.reason)
+    if (data) {
+      await supabaseAdmin.from('scheduled_calls').update({ status: 'dialing', vapi_call_id: data.id }).eq('id', call.id)
+      results.push({ id: call.id, type: 'scheduled_call', action: 'dialing', vapiCallId: data.id })
+    } else {
+      await supabaseAdmin.from('scheduled_calls').update({ status: 'failed', called_at: new Date().toISOString() }).eq('id', call.id)
+      results.push({ id: call.id, type: 'scheduled_call', action: 'fire_failed' })
+    }
+  }
+
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // ============================================================
+  // DELEGATED_CALLS: generic two-call orchestration
+  // ============================================================
+
+  const MAX_DELEGATE_ATTEMPTS = 3
+
+  // Phase A:
+  // Check target calls that are in progress.
+  const { data: targetCallingTasks } = await supabaseAdmin
+    .from('delegated_calls')
+    .select('*')
+    .eq('status', 'target_calling')
+
+  for (const task of targetCallingTasks ?? []) {
+    if (!task.target_call_id) continue
+
+    const vapiCall = await checkVapiCallStatus(task.target_call_id)
+
+    if (!vapiCall || vapiCall.status !== 'ended') {
+      continue
+    }
+
+    const endedReason = vapiCall.endedReason || ''
+    const isRetryable = RETRYABLE_REASONS.some((reason) =>
+      endedReason.includes(reason)
+    )
+
+    const attemptCount = task.attempt_count ?? 0
+
+    if (isRetryable && attemptCount < MAX_DELEGATE_ATTEMPTS) {
+      const nextAttempt = new Date(
+        Date.now() + RETRY_DELAY_MINUTES * 60 * 1000
+      )
+
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'pending',
+          target_call_id: null,
+          scheduled_time: nextAttempt.toISOString(),
+          error_message: endedReason,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'target_retry_scheduled',
+        endedReason,
+        attemptCount,
+      })
+
+      continue
+    }
+
+    if (isRetryable) {
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'failed',
+          error_message: `Target could not be reached after ${attemptCount} attempts: ${endedReason}`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'target_retries_exhausted',
+        endedReason,
+      })
+
+      continue
+    }
+
+    const targetTranscript =
+      vapiCall.artifact?.transcript ??
+      vapiCall.transcript ??
+      null
+
+    const targetSummary =
+      vapiCall.analysis?.summary ??
+      vapiCall.summary ??
+      'The call ended without a clear outcome.'
+
+    if (!task.report_back) {
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'completed',
+          target_transcript: targetTranscript,
+          target_summary: targetSummary,
+          target_outcome: targetSummary,
+          error_message: null,
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'completed_without_report_back',
+        targetSummary,
+      })
+
+      continue
+    }
+
+    const targetDescription = task.target_name
+      ? task.target_name
+      : 'the person you asked me to call'
+
+    const reportMessage =
+      `You asked me to call ${targetDescription} and complete this task: ` +
+      `"${task.task_instruction}". The outcome was: ${targetSummary}`
+
+    const reportData = await fireOutboundCall(
+      task.requester_phone,
+      reportMessage
+    )
+
+    if (reportData) {
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'report_calling',
+          target_transcript: targetTranscript,
+          target_summary: targetSummary,
+          target_outcome: targetSummary,
+          report_call_id: reportData.id,
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'report_call_started',
+        vapiCallId: reportData.id,
+        targetSummary,
+      })
+    } else {
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'failed',
+          target_transcript: targetTranscript,
+          target_summary: targetSummary,
+          target_outcome: targetSummary,
+          error_message: 'The report-back call could not be started.',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'report_call_failed',
+      })
+    }
+  }
+
+  // Phase B:
+  // Check report-back calls and mark the delegation completed.
+  const { data: reportCallingTasks } = await supabaseAdmin
+    .from('delegated_calls')
+    .select('*')
+    .eq('status', 'report_calling')
+
+  for (const task of reportCallingTasks ?? []) {
+    if (!task.report_call_id) continue
+
+    const vapiCall = await checkVapiCallStatus(task.report_call_id)
+
+    if (!vapiCall || vapiCall.status !== 'ended') {
+      continue
+    }
+
+    const reportTranscript =
+      vapiCall.artifact?.transcript ??
+      vapiCall.transcript ??
+      null
+
+    await supabaseAdmin
+      .from('delegated_calls')
+      .update({
+        status: 'completed',
+        report_transcript: reportTranscript,
+        error_message: null,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', task.id)
+
+    results.push({
+      id: task.id,
+      type: 'delegated_call',
+      action: 'completed',
+    })
+  }
+
+  // Phase C:
+  // Start newly-created delegated calls that are now due.
+  const { data: pendingDelegatedCalls } = await supabaseAdmin
+    .from('delegated_calls')
     .select('*')
     .eq('status', 'pending')
     .lte('scheduled_time', now)
 
-  if (error) {
-    console.error('[Cron] fetch error:', error.message)
-    return NextResponse.json({ error: error.message, results }, { status: 500 })
-  }
+  for (const task of pendingDelegatedCalls ?? []) {
+    const summaryPrompt =
+      `Summarize the outcome of this delegated telephone task in one ` +
+      `clear, concise sentence. State whether the task was completed and ` +
+      `include any answer, commitment or important response. ` +
+      `Task: "${task.task_instruction}"`
 
-  console.log(`[Cron] found ${dueCalls?.length ?? 0} due calls to fire`)
+    const requesterContext = task.requester_name
+      ? ` This task is on behalf of ${task.requester_name}.`
+      : ''
 
-  for (const call of dueCalls ?? []) {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-      const res = await fetch(`${baseUrl}/api/call/outbound`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: call.phone_number,
-          message: call.reason,
-        }),
-      })
+    const targetMessage =
+      `Your private objective for this call is: ${task.task_instruction}.` +
+      requesterContext +
+      ` Carry it out naturally through a brief conversation. ` +
+      `Do not read these instructions aloud verbatim.`
 
-      if (res.ok) {
-        const data = await res.json()
-        await supabaseAdmin
-          .from('scheduled_calls')
-          .update({ status: 'dialing', vapi_call_id: data.id })
-          .eq('id', call.id)
-        results.push({ id: call.id, action: 'dialing', vapiCallId: data.id })
-      } else {
-        await supabaseAdmin
-          .from('scheduled_calls')
-          .update({ status: 'failed', called_at: new Date().toISOString() })
-          .eq('id', call.id)
-        results.push({ id: call.id, action: 'fire_failed' })
-      }
-    } catch (err) {
-      console.error(`[Cron] error firing call ${call.id}:`, err)
+    const callData = await fireOutboundCall(
+      task.target_phone,
+      targetMessage,
+      summaryPrompt
+    )
+
+    if (callData) {
       await supabaseAdmin
-        .from('scheduled_calls')
-        .update({ status: 'failed', called_at: new Date().toISOString() })
-        .eq('id', call.id)
-      results.push({ id: call.id, action: 'fire_error' })
+        .from('delegated_calls')
+        .update({
+          status: 'target_calling',
+          target_call_id: callData.id,
+          attempt_count: (task.attempt_count ?? 0) + 1,
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'target_call_started',
+        vapiCallId: callData.id,
+      })
+    } else {
+      await supabaseAdmin
+        .from('delegated_calls')
+        .update({
+          status: 'failed',
+          error_message: 'The target call could not be started.',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+
+      results.push({
+        id: task.id,
+        type: 'delegated_call',
+        action: 'target_call_failed',
+      })
     }
   }
-
-  return NextResponse.json({ checked: dialingCalls?.length ?? 0, fired: dueCalls?.length ?? 0, results })
+  return NextResponse.json({ results })
 }
+
+
