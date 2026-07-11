@@ -1,8 +1,6 @@
-﻿// Twilio WhatsApp webhook â€” called when a WhatsApp message/voice note arrives.
-// No auth required â€” Twilio POSTs here directly (sandbox or production sender).
-
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import twilio from 'twilio'
 
 export const runtime = 'nodejs'
 
@@ -11,62 +9,115 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const GABBY_SYSTEM_PROMPT = `You are Gabby, a friendly South African AI personal assistant from myAIpa.
+const GABBY_SYSTEM_PROMPT = `You are Gabby, a friendly South African AI personal assistant from MyAIPA.
 
 RULES:
-- Keep answers SHORT - 1 to 2 sentences maximum. This is a WhatsApp voice note reply.
-- Be warm, natural and helpful. Sound like a real person, not a robot.
-- NEVER make up information. If you don't know, say so honestly.
-- Ask one question at a time.
+- Keep replies short and natural, usually 1 to 3 sentences.
+- Be warm, helpful and professional.
+- Reply in the same language as the customer where possible.
+- Never invent facts.
+- Ask only one question at a time.
+- You may chat with customers through WhatsApp.
+- Do not claim that you sent an email, created an invoice, booked an appointment or completed another action unless that action was actually performed.
+- If a requested capability is not connected yet, explain that honestly.`
 
-CRITICAL - NO FABRICATED ACTIONS:
-- You currently have NO ability to send, create, or do anything. You can only chat.
-- NEVER say you have sent, created, booked, or done something. You cannot.
-- If someone asks you to do something, say honestly: I can't do that yet, but it's coming soon.`
-
-function xmlEscape(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+function xmlEscape(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
 }
 
-// â”€â”€ Download Twilio media (requires Basic Auth) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function getPublicWebhookUrl(request: NextRequest): string {
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto') ?? 'https'
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}${request.nextUrl.pathname}`
+  }
+
+  return request.url
+}
+
+async function logWhatsAppMessage(data: {
+  phoneNumber: string
+  direction: 'inbound' | 'outbound'
+  messageBody?: string
+  mediaUrl?: string
+  messageSid?: string
+  status?: string
+}): Promise<void> {
+  const { error } = await supabaseAdmin.from('whatsapp_messages').insert({
+    phone_number: data.phoneNumber,
+    direction: data.direction,
+    message_body: data.messageBody || null,
+    media_url: data.mediaUrl || null,
+    twilio_message_sid: data.messageSid || null,
+    status: data.status || null,
+  })
+
+  if (error) {
+    console.error('[WhatsApp] Database logging error:', error.message)
+  }
+}
+
 async function downloadTwilioMedia(mediaUrl: string): Promise<Buffer> {
-  const res = await fetch(mediaUrl, {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID
+  const authToken = process.env.TWILIO_AUTH_TOKEN
+
+  if (!accountSid || !authToken) {
+    throw new Error('Twilio credentials are not configured')
+  }
+
+  const response = await fetch(mediaUrl, {
     headers: {
       Authorization:
         'Basic ' +
-        Buffer.from(
-          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
-        ).toString('base64'),
+        Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
     },
     redirect: 'follow',
   })
-  if (!res.ok) throw new Error(`Media download failed: ${res.status}`)
-  return Buffer.from(await res.arrayBuffer())
-}
 
-// â”€â”€ Transcribe via ElevenLabs Scribe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
-  const form = new FormData()
-  form.append('file', new Blob([new Uint8Array(audioBuffer)], { type: 'audio/ogg' }), 'voice.ogg')
-  form.append('model_id', 'scribe_v1')
-  // No language forced â€” Scribe auto-detects (handles both English and Afrikaans)
-
-  const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
-    method: 'POST',
-    headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY! },
-    body: form,
-  })
-
-  if (!res.ok) {
-    console.error('[WhatsApp] Scribe error:', await res.text())
-    throw new Error(`Transcription failed: ${res.status}`)
+  if (!response.ok) {
+    throw new Error(`Media download failed: ${response.status}`)
   }
 
-  const data = await res.json()
-  return data.text ?? ''
+  return Buffer.from(await response.arrayBuffer())
 }
 
-// â”€â”€ Ask Gabby (Claude) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
+  const form = new FormData()
+
+  form.append(
+    'file',
+    new Blob([new Uint8Array(audioBuffer)], { type: 'audio/ogg' }),
+    'voice.ogg'
+  )
+
+  form.append('model_id', 'scribe_v1')
+
+  const response = await fetch(
+    'https://api.elevenlabs.io/v1/speech-to-text',
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY!,
+      },
+      body: form,
+    }
+  )
+
+  if (!response.ok) {
+    console.error('[WhatsApp] Transcription error:', await response.text())
+    throw new Error(`Transcription failed: ${response.status}`)
+  }
+
+  const result = await response.json()
+  return result.text ?? ''
+}
+
 async function askGabby(userMessage: string): Promise<string> {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -79,132 +130,260 @@ async function askGabby(userMessage: string): Promise<string> {
       model: 'claude-sonnet-4-6',
       max_tokens: 300,
       system: GABBY_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMessage }],
+      messages: [
+        {
+          role: 'user',
+          content: userMessage,
+        },
+      ],
     }),
   })
 
   if (!response.ok) {
     console.error('[WhatsApp] Claude error:', await response.text())
-    throw new Error('Gabby brain failed')
+    throw new Error('Gabby response generation failed')
   }
 
   const result = await response.json()
-  return result.content?.[0]?.text ?? "Sorry, I didn't catch that."
+
+  return result.content?.[0]?.text ?? 'Sorry, I did not understand that.'
 }
 
-// â”€â”€ TTS via ElevenLabs (Flash first, multilingual fallback) â€” matches /api/tts â”€â”€
-async function synthesizeElevenLabs(text: string, modelId: string): Promise<ArrayBuffer | null> {
-  const apiKey = process.env.ELEVENLABS_API_KEY!
-  const voiceId = process.env.ELEVENLABS_VOICE_ID!
+async function synthesizeElevenLabs(
+  text: string,
+  modelId: string
+): Promise<ArrayBuffer | null> {
+  const apiKey = process.env.ELEVENLABS_API_KEY
+  const voiceId = process.env.ELEVENLABS_VOICE_ID
 
-  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-    method: 'POST',
-    headers: {
-      'xi-api-key': apiKey,
-      'Content-Type': 'application/json',
-      Accept: 'audio/mpeg',
-    },
-    body: JSON.stringify({
-      text,
-      model_id: modelId,
-      voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-    }),
-  })
-
-  console.log(`[WhatsApp TTS] ${modelId} status:`, response.status)
-  if (!response.ok) {
-    console.error(`[WhatsApp TTS] ${modelId} error:`, await response.text())
+  if (!apiKey || !voiceId) {
+    console.error('[WhatsApp] ElevenLabs configuration is incomplete')
     return null
   }
+
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: modelId,
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+        },
+      }),
+    }
+  )
+
+  console.log(`[WhatsApp TTS] ${modelId} status:`, response.status)
+
+  if (!response.ok) {
+    console.error(
+      `[WhatsApp TTS] ${modelId} error:`,
+      await response.text()
+    )
+    return null
+  }
+
   return response.arrayBuffer()
 }
 
-async function textToSpeechAndUpload(text: string, folder: string): Promise<string | null> {
-  let audioBuffer = await synthesizeElevenLabs(text, 'eleven_flash_v2_5')
+async function textToSpeechAndUpload(
+  text: string,
+  folder: string
+): Promise<string | null> {
+  let audioBuffer = await synthesizeElevenLabs(
+    text,
+    'eleven_flash_v2_5'
+  )
+
   if (!audioBuffer) {
-    console.log('[WhatsApp TTS] Flash failed â€” falling back to eleven_multilingual_v2')
-    audioBuffer = await synthesizeElevenLabs(text, 'eleven_multilingual_v2')
+    audioBuffer = await synthesizeElevenLabs(
+      text,
+      'eleven_multilingual_v2'
+    )
   }
-  if (!audioBuffer || audioBuffer.byteLength < 100) return null
 
-  const buffer = Buffer.from(audioBuffer)
-  const path = `${folder}/${Date.now()}.mp3`
-
-  const { error: upErr } = await supabaseAdmin.storage
-    .from('whatsapp-audio')
-    .upload(path, buffer, { contentType: 'audio/mpeg', upsert: true })
-
-  if (upErr) {
-    console.error('[WhatsApp] storage upload error:', upErr.message)
+  if (!audioBuffer || audioBuffer.byteLength < 100) {
     return null
   }
 
-  const { data: urlData } = supabaseAdmin.storage.from('whatsapp-audio').getPublicUrl(path)
-  return urlData.publicUrl
+  const path = `${folder}/${Date.now()}.mp3`
+
+  const { error } = await supabaseAdmin.storage
+    .from('whatsapp-audio')
+    .upload(path, Buffer.from(audioBuffer), {
+      contentType: 'audio/mpeg',
+      upsert: true,
+    })
+
+  if (error) {
+    console.error('[WhatsApp] Audio upload error:', error.message)
+    return null
+  }
+
+  const { data } = supabaseAdmin.storage
+    .from('whatsapp-audio')
+    .getPublicUrl(path)
+
+  return data.publicUrl
 }
 
-// â”€â”€ Main webhook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function POST(request: NextRequest) {
   try {
-    const form = await request.formData()
-    const from = (form.get('From') as string) ?? ''
-    const body = ((form.get('Body') as string) ?? '').trim()
-    const numMedia = parseInt((form.get('NumMedia') as string) ?? '0')
-    const mediaType = (form.get('MediaContentType0') as string) ?? ''
-    const mediaUrl = (form.get('MediaUrl0') as string) ?? ''
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+    const signature = request.headers.get('x-twilio-signature') ?? ''
+    const rawBody = await request.text()
+    const form = new URLSearchParams(rawBody)
+    const parameters = Object.fromEntries(form.entries())
 
-    console.log(`[WhatsApp] from ${from} | body: "${body}" | media: ${numMedia} (${mediaType})`)
+    if (!authToken) {
+      console.error('[WhatsApp] TWILIO_AUTH_TOKEN is missing')
+
+      return NextResponse.json(
+        { success: false, error: 'Webhook is not configured' },
+        { status: 503 }
+      )
+    }
+
+    const webhookUrl = getPublicWebhookUrl(request)
+
+    const validSignature = twilio.validateRequest(
+      authToken,
+      signature,
+      webhookUrl,
+      parameters
+    )
+
+    if (!validSignature) {
+      console.warn('[WhatsApp] Invalid Twilio signature')
+
+      return NextResponse.json(
+        { success: false, error: 'Invalid webhook signature' },
+        { status: 403 }
+      )
+    }
+
+    const from = form.get('From') ?? ''
+    const body = (form.get('Body') ?? '').trim()
+    const messageSid = form.get('MessageSid') ?? ''
+    const numMedia = Number.parseInt(form.get('NumMedia') ?? '0', 10)
+    const mediaType = form.get('MediaContentType0') ?? ''
+    const mediaUrl = form.get('MediaUrl0') ?? ''
+
+    console.log(
+      `[WhatsApp] From ${from} | SID ${messageSid} | Media ${numMedia}`
+    )
 
     let userMessage = ''
 
-    if (numMedia > 0 && mediaType.startsWith('audio/')) {
-      console.log('[WhatsApp] downloading voice note...')
+    if (
+      numMedia > 0 &&
+      mediaType.startsWith('audio/') &&
+      mediaUrl
+    ) {
       const audioBuffer = await downloadTwilioMedia(mediaUrl)
-      console.log(`[WhatsApp] downloaded ${audioBuffer.length} bytes â€” transcribing...`)
       userMessage = await transcribeAudio(audioBuffer)
-      console.log(`[WhatsApp] transcribed: "${userMessage}"`)
     } else if (body) {
       userMessage = body
     } else {
+      const unsupportedReply =
+        'I can currently respond to text messages and voice notes.'
+
+      await logWhatsAppMessage({
+        phoneNumber: from,
+        direction: 'inbound',
+        mediaUrl,
+        messageSid,
+        status: 'received',
+      })
+
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>I can't handle that type of message yet, but it's coming soon! Send me a text or voice note.</Message></Response>`
-      return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
+<Response>
+  <Message>${xmlEscape(unsupportedReply)}</Message>
+</Response>`
+
+      return new NextResponse(xml, {
+        headers: {
+          'Content-Type': 'text/xml; charset=utf-8',
+        },
+      })
     }
 
-    if (!userMessage) {
+    if (!userMessage.trim()) {
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>I didn't catch that â€” could you try again?</Message></Response>`
-      return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
+<Response>
+  <Message>I did not catch that. Please try again.</Message>
+</Response>`
+
+      return new NextResponse(xml, {
+        headers: {
+          'Content-Type': 'text/xml; charset=utf-8',
+        },
+      })
     }
 
-    console.log('[WhatsApp] asking Gabby...')
+    await logWhatsAppMessage({
+      phoneNumber: from,
+      direction: 'inbound',
+      messageBody: userMessage,
+      mediaUrl,
+      messageSid,
+      status: 'received',
+    })
+
     const gabbyReply = await askGabby(userMessage)
-    console.log(`[WhatsApp] Gabby: "${gabbyReply}"`)
 
-    console.log('[WhatsApp] generating voice note...')
-    const audioUrl = await textToSpeechAndUpload(gabbyReply, `replies/${Date.now()}`)
+    const audioUrl = await textToSpeechAndUpload(
+      gabbyReply,
+      `replies/${Date.now()}`
+    )
 
-    let xml: string
-    if (audioUrl) {
-      xml = `<?xml version="1.0" encoding="UTF-8"?>
+    await logWhatsAppMessage({
+      phoneNumber: from,
+      direction: 'outbound',
+      messageBody: gabbyReply,
+      mediaUrl: audioUrl ?? undefined,
+      status: 'queued',
+    })
+
+    const xml = audioUrl
+      ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Message>
     <Body>${xmlEscape(gabbyReply)}</Body>
-    <Media>${audioUrl}</Media>
+    <Media>${xmlEscape(audioUrl)}</Media>
   </Message>
 </Response>`
-    } else {
-      // Fallback to text-only if TTS fails
-      xml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>${xmlEscape(gabbyReply)}</Message></Response>`
-    }
+      : `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${xmlEscape(gabbyReply)}</Message>
+</Response>`
 
-    console.log('[WhatsApp] reply sent â€”', audioUrl ? 'text + voice note' : 'text only (TTS failed)')
-    return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
-  } catch (err) {
-    console.error('[WhatsApp] unhandled error:', err)
+    return new NextResponse(xml, {
+      headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+      },
+    })
+  } catch (error) {
+    console.error('[WhatsApp] Unhandled webhook error:', error)
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>Sorry, I had a hiccup! Try again in a moment.</Message></Response>`
-    return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
+<Response>
+  <Message>Sorry, I had a temporary problem. Please try again shortly.</Message>
+</Response>`
+
+    return new NextResponse(xml, {
+      headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+      },
+      status: 200,
+    })
   }
 }
