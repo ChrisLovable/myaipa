@@ -35,7 +35,7 @@ const ANSWERED_REASONS = [
 const MIN_CONVERSATION_DURATION_SEC = 15
 
 const RETRY_DELAY_MINUTES = 10
-const CHRIS_NUMBER = '+27766213953'
+const CHRIS_NUMBER = '+27648588748'
 
 export async function POST(request: NextRequest) {
   try {
