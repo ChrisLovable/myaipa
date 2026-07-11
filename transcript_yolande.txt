@@ -1,0 +1,11 @@
+﻿AI: Hi. This is Gabby calling on Chris's behalf.
+User: Yolandi, the 3. At the tone, record your message. Then press hash or hang up.
+AI: Hey. I'm getting your voice mail. Let me leave a message for you. Yolanda, hi. It's Gabby here, Chris's personal assistant. I'd really like to have a quick chat with you when you get a chance. It's nothing to worry about. Just wanna touch base. Could you give me a callback when you're free? Thanks so much.
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: Pressing 1.
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: I'm pressing 1 to confirm the message.
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: I apologize for the confusion. It seems the system isn't registering my input.
+User: If you have problems with your voice mail, please contact Vodacom customer care.
+

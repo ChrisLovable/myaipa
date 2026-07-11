@@ -1,0 +1,25 @@
+﻿AI: Hi. This is Gabby calling on Chris's behalf.
+User: Hello?
+AI: Hi there. Is Yolande available?
+User: Hello? Yes.
+AI: Thanks. Can I have a quick word with her?
+User: Yes.
+AI: Hi, Yolande. It's Gabby, Chris's AI personal assistant. Now an okay time for a quick private chat?
+User: Yes.
+AI: Thanks so much. Chris asked me to call and let you know that he knows things have been difficult. And he's working really hard to improve the situation. He cares deeply about you and is committed to finding a way forward. How are you feeling about everything?
+User: That's okay. Thank you. I appreciate every
+AI: You're welcome. I'm glad that means something to you.
+User: No. It's very much Not trustable. Succeed. I still do believe in in
+AI: I
+AI: I hear you. It sounds like you've been through a lot. Is there anything specific you'd like me to make sure Chris knows about?
+User: Now just tell him that I still believe in him, and prayed for him every day. And I know he will make a success of it.
+AI: That's really beautiful, Yuk.
+User: Just keep your faith.
+AI: That's beautiful, Yolanda. I'll make sure Chris knows exactly that. That you believe in him, you're praying for him every day, and you know he'll make a success of it. He'll understand how much that means.
+User: Yes. I believe so.
+AI: Thank you for telling me that, Yolande. I'll make sure Chris understands exactly what you've said. I hope you have a really good weekend.
+User: Thank you. You too. Thanks, Gabby.
+AI: You're welcome, Yolande. Take care.
+User: But
+AI: Yes?
+

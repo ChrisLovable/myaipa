@@ -1,5 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+async function synthesizeElevenLabs(
+  apiKey: string,
+  voiceId: string,
+  text: string,
+  modelId: string,
+): Promise<ArrayBuffer | null> {
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: modelId,
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+        },
+      }),
+    }
+  )
+
+  console.log(`[TTS] ElevenLabs ${modelId} status:`, response.status)
+
+  if (!response.ok) {
+    console.error(`[TTS] ${modelId} error:`, await response.text())
+    return null
+  }
+
+  return response.arrayBuffer()
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { text, language } = await request.json()
@@ -10,48 +46,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No text' }, { status: 400 })
     }
 
-    const apiKey = process.env.GOOGLE_TTS_API_KEY
-    if (!apiKey) {
-      console.error('[TTS] GOOGLE_TTS_API_KEY missing')
+    const apiKey = process.env.ELEVENLABS_API_KEY
+    const voiceId = process.env.ELEVENLABS_VOICE_ID
+    if (!apiKey || !voiceId) {
+      console.error('[TTS] ELEVENLABS_API_KEY or ELEVENLABS_VOICE_ID missing')
       return NextResponse.json({ error: 'API key missing' }, { status: 500 })
     }
 
-    // Voice and speed differ per language
-    const isEnglish = language === 'en'
-    const voiceConfig = isEnglish
-      ? { languageCode: 'en-GB', name: 'en-GB-Neural2-C', ssmlGender: 'FEMALE' }
-      : { languageCode: 'af-ZA', name: 'af-ZA-Standard-A', ssmlGender: 'FEMALE' }
-    const speakingRate = isEnglish ? 1.15 : 1.3
-
-    console.log(`[TTS] voice: ${voiceConfig.name} | rate: ${speakingRate}`)
-
-    const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input: { text },
-          voice: voiceConfig,
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate,
-            pitch: 0.0,
-          },
-        }),
-      }
-    )
-
-    console.log('[TTS] Google status:', response.status)
-
-    if (!response.ok) {
-      const err = await response.text()
-      console.error('[TTS] Google error:', err)
-      return NextResponse.json({ error: err }, { status: 500 })
+    // Flash first (~75ms latency), multilingual_v2 as fallback
+    let audioBuffer = await synthesizeElevenLabs(apiKey, voiceId, text, 'eleven_flash_v2_5')
+    if (!audioBuffer) {
+      console.log('[TTS] Flash failed — falling back to eleven_multilingual_v2')
+      audioBuffer = await synthesizeElevenLabs(apiKey, voiceId, text, 'eleven_multilingual_v2')
     }
 
-    const data = await response.json()
-    const audioBuffer = Buffer.from(data.audioContent, 'base64')
+    if (!audioBuffer || audioBuffer.byteLength < 100) {
+      return NextResponse.json({ error: 'TTS synthesis failed' }, { status: 500 })
+    }
 
     console.log('[TTS] audio buffer size:', audioBuffer.byteLength)
 
@@ -62,7 +73,6 @@ export async function POST(request: NextRequest) {
         'Content-Length': audioBuffer.byteLength.toString(),
       },
     })
-
   } catch (err) {
     console.error('[TTS] route error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

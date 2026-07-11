@@ -1,0 +1,13 @@
+﻿AI: Hi. This is Gabby calling on Chris's behalf.
+User: Hello at the moment. Please leave your time and number. I'll get back to you as soon as possible. Thank you. Bye bye.
+AI: Got it. Thanks. I'll try
+User: Record your message. Then press hash or hang up.
+AI: Hi, prop. It's Gabby calling from my AIPA on behalf of your brother Chris. He wanted me to reach out and say hi. Hopes you, Albert, and the fan are having an amazing holiday out there. Give me a callback when you get a chance. Yeah? Cheers.
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: 1.
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: 1,
+User: If you are satisfied with your message, press 1. To listen to your message, press 2. To delete and rerecord, press 3. To continue recording where you left off, press 4.
+AI: I apologize for the confusion. It seems the voice mail system
+User: If you have problems with your voice mail, please contact Vodacom customer care.
+

@@ -1,9 +1,7 @@
-// Outbound call route — powered by Vapi for natural conversational callbacks.
-// IMPORTANT: Vapi only supports overriding firstMessage and dynamic {{variables}}
-// per call for dashboard-created assistants — NOT the system prompt text itself.
-// So the reminder reason is passed as a variable ({{reminder_reason}}) that the
-// dashboard system prompt references, with an explicit instruction there never
-// to read it aloud verbatim.
+﻿// Outbound call route â€” powered by Vapi. Supports two modes:
+// 1. Simple reminder/message calls (existing behavior)
+// 2. Delegate calls â€” pass summaryPrompt to have Vapi extract a structured
+//    answer from the conversation afterward (used for delegate_call tasks)
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -17,8 +15,8 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { to, message, userId, language } = await request.json()
-    console.log('[Call/Outbound] to:', to, '| message:', message, '| userId:', userId)
+    const { to, message, userId, language, summaryPrompt } = await request.json()
+    console.log('[Call/Outbound] to:', to, '| message:', message, '| summaryPrompt:', !!summaryPrompt)
 
     if (!to) {
       return NextResponse.json({ error: 'Nommer vereis' }, { status: 400 })
@@ -34,9 +32,31 @@ export async function POST(request: NextRequest) {
     }
 
     const reminderReason = message || ''
+    const firstMessage = "... Hi! This is Gabby, calling on Chris's behalf."
 
-    // Generic, natural opener — never includes the raw reason text.
-    const firstMessage = "Hi! This is Gabby, calling on Chris's behalf."
+    const assistantOverrides: Record<string, unknown> = {
+      firstMessage,
+      variableValues: {
+        reminder_reason: reminderReason,
+        is_reminder_call: reminderReason ? true : false,
+      },
+    }
+
+    // If this is a delegate call, ask Vapi to produce a structured summary
+    // (the answer to relay back) once the call ends.
+    if (summaryPrompt) {
+      assistantOverrides.analysisPlan = {
+        summaryPlan: {
+          enabled: true,
+          messages: [
+            {
+              role: 'system',
+              content: summaryPrompt,
+            },
+          ],
+        },
+      }
+    }
 
     const vapiRes = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
@@ -48,13 +68,7 @@ export async function POST(request: NextRequest) {
         assistantId: vapiAssistantId,
         phoneNumberId: vapiPhoneNumberId,
         customer: { number: to },
-        assistantOverrides: {
-          firstMessage,
-          variableValues: {
-            reminder_reason: reminderReason,
-            is_reminder_call: reminderReason ? true : false,
-          },
-        },
+        assistantOverrides,
       }),
     })
 
@@ -65,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     const vapiData = await vapiRes.json()
-    console.log('[Call/Outbound] Vapi call created — id:', vapiData.id, '| status:', vapiData.status)
+    console.log('[Call/Outbound] Vapi call created â€” id:', vapiData.id, '| status:', vapiData.status)
 
     if (userId) {
       const { error: dbErr } = await supabaseAdmin.from('calls_log').insert({

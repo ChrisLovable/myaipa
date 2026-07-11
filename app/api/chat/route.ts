@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 
+export const maxDuration = 60
+
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 const supabaseAdmin = createClient(
@@ -336,7 +338,29 @@ async function buildSystemPrompt(userId: string | null, sessionLanguage?: string
   return SYSTEM_PROMPT + extra
 }
 
-// ─── Fix STT misspellings of "Gabby" before sending to Claude ─
+// ─── Quick-response cache (skip Claude for common greetings) ─
+const QUICK_RESPONSES: Record<string, string> = {
+  'hallo': 'Hallo! Hoe kan ek jou help vandag?',
+  'hello': 'Hello! How can I help you today?',
+  'hoe gaan dit': 'Goed dankie! En jy?',
+  'how are you': "I'm doing great, thanks for asking!",
+  'dankie': 'Plesier! Is daar iets anders waarmee ek kan help?',
+  'thanks': "You're welcome! Anything else I can help with?",
+}
+
+function pickModel(userMessage: string, hasUpload: boolean): string {
+  const lower = userMessage.toLowerCase()
+  const isSimple =
+    userMessage.length < 100 &&
+    !lower.includes('analyseer') &&
+    !lower.includes('analyse') &&
+    !lower.includes('dokument') &&
+    !lower.includes('document') &&
+    !hasUpload
+
+  return isSimple ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6'
+}
+
 function cleanTranscription(text: string): string {
   return text
     .replace(/\bGabie\b/gi, 'Gabby')
@@ -354,8 +378,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Ongeldige versoek' }, { status: 400 })
     }
 
-    const systemPrompt = await buildSystemPrompt(userId ?? null, language ?? 'af')
-
     // Clean STT name misspellings in all user messages before passing to Claude
     const processedMessages = messages.map((m: { role: string; content: string }) =>
       m.role === 'user' ? { ...m, content: cleanTranscription(m.content) } : m
@@ -371,8 +393,28 @@ export async function POST(request: NextRequest) {
     }
 
     const contextMessages = processedMessages.slice(-20)
+    const lastUserMsg = contextMessages.filter((m: { role: string }) => m.role === 'user').pop()
+    const userMessage = (lastUserMsg?.content ?? '')
+      .replace(/\n\n\[Opgelaaide dokument inhoud\][\s\S]*/, '')
+      .trim()
+
+    // Instant reply for common greetings — no Claude call needed
+    const normalised = userMessage.toLowerCase().trim()
+    if (!uploadedFileText && QUICK_RESPONSES[normalised]) {
+      const text = QUICK_RESPONSES[normalised]
+      if (userId && lastUserMsg) {
+        await supabaseAdmin.from('conversations').insert([
+          { user_id: userId, role: 'user', content: lastUserMsg.content },
+          { user_id: userId, role: 'assistant', content: text },
+        ])
+      }
+      return NextResponse.json({ text })
+    }
+
+    const systemPrompt = await buildSystemPrompt(userId ?? null, language ?? 'af')
+    const model = pickModel(userMessage, !!uploadedFileText)
     const msgParams = {
-      model: 'claude-sonnet-4-6' as const,
+      model: model as 'claude-haiku-4-5-20251001' | 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: systemPrompt,
       messages: contextMessages.map((m: { role: string; content: string }) => ({
@@ -382,8 +424,6 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Single streaming call — buffer first line to detect ACTION: ──
-    // This replaces the old pattern of calling messages.create() (non-streaming)
-    // first and then messages.stream() again — which doubled every response time.
     const anthropicStream = anthropic.messages.stream(msgParams)
     const iter = anthropicStream[Symbol.asyncIterator]()
 
@@ -461,27 +501,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ text: textResponse, action: actionResult })
     }
 
-    // Phase 2b: not an action — stream immediately.
+    // Phase 2b: not an action — stream immediately as SSE.
     // Flush peekBuf first, then continue draining the same iterator.
     const encoder = new TextEncoder()
     let fullText = peekBuf
 
+    const sendDelta = (controller: ReadableStreamDefaultController, text: string) => {
+      if (!text) return
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`))
+    }
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // Send what was already buffered during action detection
-          if (peekBuf) {
-            controller.enqueue(encoder.encode(peekBuf))
-          }
+          sendDelta(controller, peekBuf)
 
-          // Continue from the same iterator — no second Claude call
           while (true) {
             const result = await iter.next()
             if (result.done) break
             const event = result.value
             if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
               fullText += event.delta.text
-              controller.enqueue(encoder.encode(event.delta.text))
+              sendDelta(controller, event.delta.text)
             }
           }
 
@@ -495,6 +536,7 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'))
           controller.close()
         } catch (err) {
           controller.error(err)
@@ -504,9 +546,9 @@ export async function POST(request: NextRequest) {
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Transfer-Encoding': 'chunked',
+        'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
       },
     })
   } catch {

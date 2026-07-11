@@ -43,6 +43,8 @@ export default function ChatPage() {
   const audioContextRef   = useRef<AudioContext | null>(null)
   const recordingStartRef = useRef<number>(0)
   const inputRef          = useRef<HTMLInputElement>(null)
+  const ttsQueueRef       = useRef<string[]>([])
+  const ttsDrainingRef    = useRef(false)
 
   const router   = useRouter()
   const supabase = createClient()
@@ -86,6 +88,8 @@ export default function ChatPage() {
   }, [])
 
   function stopCurrentAudio() {
+    ttsQueueRef.current = []
+    ttsDrainingRef.current = false
     if (audioSourceRef.current) {
       try {
         audioSourceRef.current.stop()
@@ -255,7 +259,7 @@ export default function ChatPage() {
       const contentType = response.headers.get('content-type') || ''
 
       if (contentType.includes('application/json')) {
-        const { text, action, imageUrl } = (await response.json()) as {
+        const { text, action, imageUrl: imgUrl } = (await response.json()) as {
           text: string
           action: ActionData | null
           imageUrl?: string
@@ -264,44 +268,141 @@ export default function ChatPage() {
           role: 'assistant',
           content: text,
           action: action ?? undefined,
-          imageUrl: imageUrl ?? undefined,
+          imageUrl: imgUrl ?? undefined,
         }
         setMessages((prev) => [...prev, assistantMsg])
-        if (text) await playTTS(text)
+        if (text) void enqueueTTS(text)
         else setState('waiting')
       } else {
         const reader = response.body?.getReader()
         if (!reader) throw new Error('No reader')
 
-        const decoder  = new TextDecoder()
-        let fullText   = ''
-        let firstChunk = true
+        const decoder = new TextDecoder()
+        let sseBuffer = ''
+        const fullTextRef = { current: '' }
+        let sentenceBuffer = ''
+        let ttsQueuedCount = 0
+        let displayedLen = 0
+        let revealTimer: ReturnType<typeof setTimeout> | null = null
+        let revealResolve: (() => void) | null = null
+        let gotFirstToken = false
 
         setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
 
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          if (firstChunk) { setState('speaking'); firstChunk = false }
-          fullText += decoder.decode(value, { stream: true })
+        const updateVisible = (visible: string) => {
           setMessages((prev) => {
             const updated = [...prev]
-            updated[updated.length - 1] = { role: 'assistant', content: fullText }
+            updated[updated.length - 1] = { role: 'assistant', content: visible }
             return updated
           })
         }
 
-        if (fullText) await playTTS(fullText)
-        else setState('waiting')
+        const flushSentences = (forceRemainder = false) => {
+          while (true) {
+            const match = sentenceBuffer.match(/^(.+?[.!?])(\s+|$)/)
+            if (!match) break
+            const sentence = match[1].trim()
+            sentenceBuffer = sentenceBuffer.slice(match[0].length)
+            if (sentence) {
+              ttsQueuedCount++
+              void enqueueTTS(sentence)
+            }
+          }
+          if (forceRemainder) {
+            const remainder = sentenceBuffer.trim()
+            if (remainder) {
+              sentenceBuffer = ''
+              ttsQueuedCount++
+              void enqueueTTS(remainder)
+            }
+          }
+        }
+
+        const waitForReveal = () =>
+          new Promise<void>((resolve) => {
+            if (displayedLen >= fullTextRef.current.length) {
+              resolve()
+              return
+            }
+            revealResolve = resolve
+          })
+
+        const pumpReveal = () => {
+          const full = fullTextRef.current
+          if (displayedLen >= full.length) {
+            revealTimer = null
+            if (revealResolve) {
+              revealResolve()
+              revealResolve = null
+            }
+            return
+          }
+          const rest = full.slice(displayedLen)
+          const match = rest.match(/^(\S+\s*)/)
+          if (match) {
+            displayedLen += match[1].length
+            updateVisible(full.slice(0, displayedLen))
+          } else {
+            displayedLen = full.length
+            updateVisible(full)
+          }
+          revealTimer = setTimeout(pumpReveal, 28)
+        }
+
+        const enqueueText = (text: string) => {
+          if (!text) return
+          if (!gotFirstToken) {
+            gotFirstToken = true
+            setState('speaking')
+          }
+          fullTextRef.current += text
+          sentenceBuffer += text
+          flushSentences()
+          if (!revealTimer) pumpReveal()
+        }
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          sseBuffer += decoder.decode(value, { stream: true })
+          const parts = sseBuffer.split('\n')
+          sseBuffer = parts.pop() ?? ''
+
+          for (const line of parts) {
+            if (!line.startsWith('data: ')) continue
+            const payload = line.slice(6).trim()
+            if (!payload || payload === '[DONE]') continue
+
+            try {
+              const { text } = JSON.parse(payload) as { text?: string }
+              if (text) enqueueText(text)
+            } catch {
+              enqueueText(payload)
+            }
+          }
+        }
+
+        await waitForReveal()
+        if (displayedLen < fullTextRef.current.length) {
+          updateVisible(fullTextRef.current)
+        }
+
+        flushSentences(true)
+        if (ttsQueuedCount === 0 && fullTextRef.current) {
+          void enqueueTTS(fullTextRef.current)
+        } else if (ttsQueuedCount === 0) {
+          setState('waiting')
+        }
       }
     } catch (err) {
       console.error('[Chat] error:', err)
       setState('waiting')
     }
-  }, [userId, lastImageUrl])
+  }, [userId, lastImageUrl, userLanguage])
 
-  // ── TTS playback ─────────────────────────────────────────
-  async function playTTS(text: string) {
+  // ── TTS playback (queued, sentence-by-sentence) ──────────
+  async function playTTSOnce(text: string): Promise<void> {
     console.log('playTTS called with:', text?.substring(0, 30))
     try {
       const response = await fetch('/api/tts', {
@@ -314,7 +415,6 @@ export default function ChatPage() {
       if (!response.ok) {
         const err = await response.text()
         console.error('TTS error:', err)
-        setState('waiting')
         return
       }
 
@@ -323,7 +423,6 @@ export default function ChatPage() {
 
       if (audioBuffer.byteLength < 100) {
         console.error('Audio buffer too small — empty response from ElevenLabs')
-        setState('waiting')
         return
       }
 
@@ -331,7 +430,6 @@ export default function ChatPage() {
       audioContextRef.current = audioContext
       console.log('AudioContext state:', audioContext.state)
 
-      // Browser autoplay policy suspends AudioContext until a user gesture
       if (audioContext.state === 'suspended') {
         await audioContext.resume()
         console.log('AudioContext resumed')
@@ -346,16 +444,30 @@ export default function ChatPage() {
       setState('speaking')
       console.log('Audio playing!')
 
-      source.onended = () => {
-        setState('waiting')
-        audioContext.close()
-        console.log('Audio finished')
-      }
-
+      await new Promise<void>((resolve) => {
+        source.onended = () => {
+          audioContext.close()
+          audioSourceRef.current = null
+          audioContextRef.current = null
+          console.log('Audio finished')
+          resolve()
+        }
+      })
     } catch (err) {
       console.error('TTS playback error:', err)
-      setState('waiting')
     }
+  }
+
+  async function enqueueTTS(text: string) {
+    ttsQueueRef.current.push(text)
+    if (ttsDrainingRef.current) return
+    ttsDrainingRef.current = true
+    while (ttsQueueRef.current.length > 0) {
+      const next = ttsQueueRef.current.shift()!
+      await playTTSOnce(next)
+    }
+    ttsDrainingRef.current = false
+    setState('waiting')
   }
 
   // ── Mic button handler ───────────────────────────────────

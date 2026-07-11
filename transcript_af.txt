@@ -1,0 +1,18 @@
+﻿AI: Hi, this is Gaby. Feel free to speak to me in Afrikaans or English. I'll understand either, but I'll reply in English.
+User: So, uh, ja, ek kan Afrikaans verstaan, dis, dis wit reg. 
+AI: Perfect. I understand you completely. So what can I help you with today? 
+User: ... Uhm, ek wil by 'n woordwerfversie maak van die arbeid-
+AI: I'm sorry, I didn't quite catch that. The line crackled a bit. Could you say that again? What would you like to do?
+User: Ek wil weet hoe ver is die maan van die aarde af?
+AI: The Moon is about 384 400 kilometers away from Earth on average. Is there something else I can help you with?
+User: Klopt. Hoe spel jy Kaapstad?
+AI: . That’s spelled K-A-A-P-S-T-A-D in Afrikaans, or Cape Town in English. What else can I help you with?
+User: Wat is die vinnigste kar op aarde?
+AI: The fastest car in the world is the Bugatti Bolide, which can theoretically reach over 500 kilometers kh, though it hasn't been officially tested yet. Is there something I can actually help you with today, like scheduling a reminder or something?
+User: All right, Tonya, Tonya. Waar jy e-mails stuur?
+AI: No problem. 
+AI: Ik ben Gabby, niet Tanya. En nee, ik kan geen e-mails sturen nu. Dat is niet iets wat ik nog kan doen. Maar ik kan telefoongesprekken plannen voor je als dat zou helpen. Is er iets wat je nodig hebt?
+User: Wie is Daniel?
+AI: I'm not sure who Daniel is. You haven't mentioned anyone by that name. Are you asking about someone specific or is there something I can help you with?
+User: ... Deur Marieit gesê Tanya. ... 
+

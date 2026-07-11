@@ -1,0 +1,8 @@
+﻿AI: Hi. This is Gabby calling on Chris's behalf.
+User: Hello?
+AI: Hi there. Is this Yoland?
+User: Yes? Is me speaking?
+AI: Hi, Yolande. It's Gabby. Chris's AI personal assistant. Is now an okay time for a quick private chat?
+User: 1 is
+AI: Great. Thanks for taking the call. Chris asked me to reach out because he wants you to know that he's aware things have been difficult. And he's working really hard to improve the situation. He cares deeply about you and is committed to finding a way forward. How are you feeling about everything?
+

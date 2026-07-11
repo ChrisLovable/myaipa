@@ -36,3 +36,11 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+*.json.bak
+christiaan-call-full.json
+yolande-call-raw.json
+
+*-call-raw.json
+
+.env.local
